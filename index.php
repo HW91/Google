@@ -86,6 +86,17 @@ unset($result[0]);
   <script src="https://cdn.rawgit.com/eligrey/FileSaver.js/e9d941381475b5df8b7d7691013401e171014e89/FileSaver.min.js"></script>
   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.15.2/xlsx.core.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/TableExport/3.3.5/js/tableexport.min.js"></script>
+
+  <script type="text/javascript">
+(function(f,b){if(!b.__SV){var e,g,i,h;window.mixpanel=b;b._i=[];b.init=function(e,f,c){function g(a,d){var b=d.split(".");2==b.length&&(a=a[b[0]],d=b[1]);a[d]=function(){a.push([d].concat(Array.prototype.slice.call(arguments,0)))}}var a=b;"undefined"!==typeof c?a=b[c]=[]:c="mixpanel";a.people=a.people||[];a.toString=function(a){var d="mixpanel";"mixpanel"!==c&&(d+="."+c);a||(d+=" (stub)");return d};a.people.toString=function(){return a.toString(1)+".people (stub)"};i="disable time_event track track_pageview track_links track_forms track_with_groups add_group set_group remove_group register register_once alias unregister identify name_tag set_config reset opt_in_tracking opt_out_tracking has_opted_in_tracking has_opted_out_tracking clear_opt_in_out_tracking start_batch_senders people.set people.set_once people.unset people.increment people.append people.union people.track_charge people.clear_charges people.delete_user people.remove".split(" ");
+for(h=0;h<i.length;h++)g(a,i[h]);var j="set set_once union unset remove delete".split(" ");a.get_group=function(){function b(c){d[c]=function(){call2_args=arguments;call2=[c].concat(Array.prototype.slice.call(call2_args,0));a.push([e,call2])}}for(var d={},e=["get_group"].concat(Array.prototype.slice.call(arguments,0)),c=0;c<j.length;c++)b(j[c]);return d};b._i.push([e,f,c])};b.__SV=1.2;e=f.createElement("script");e.type="text/javascript";e.async=!0;e.src="undefined"!==typeof MIXPANEL_CUSTOM_LIB_URL?
+MIXPANEL_CUSTOM_LIB_URL:"file:"===f.location.protocol&&"//cdn.mxpnl.com/libs/mixpanel-2-latest.min.js".match(/^\/\//)?"https://cdn.mxpnl.com/libs/mixpanel-2-latest.min.js":"//cdn.mxpnl.com/libs/mixpanel-2-latest.min.js";g=f.getElementsByTagName("script")[0];g.parentNode.insertBefore(e,g)}})(document,window.mixpanel||[]);
+
+// Enabling the debug mode flag is useful during implementation,
+// but it's recommended you remove it for production
+mixpanel.init('aef322c34b82f903473aa894cd5b0d00',{debug: true}); 
+</script> 
+
 </head>
 <style type="text/css">
   #submit {
@@ -118,7 +129,7 @@ unset($result[0]);
 <div class="container">
   <!-- <h2>Search Jobs</h2> -->
   <form action="">
-    <div class="col-md-3">
+   <!--  <div class="col-md-3">
       <div class="form-group">
         <label for="keywords">By keywords:</label>
         <input type="text" value="<?= @$_GET['keywords']; ?>" class="form-control" id="keywords" name="keywords" placeholder="Search by keywords">
@@ -129,18 +140,18 @@ unset($result[0]);
         <label for="location">By Location:</label>
         <input type="text" value="<?= @$_GET['location']; ?>" class="form-control" id="location" name="location" placeholder="by location">
       </div>
-    </div>
+    </div> -->
     <!-- <div class="col-md-3">
       <div class="form-group">
         <label for="company">By company:</label>
         <input type="text" value="<?= @$_GET['company']; ?>" class="form-control" id="company" placeholder="By company" name="by_company">
       </div>
     </div> -->
-    <div class="col-md-3">
+  <!--   <div class="col-md-3">
       <div class="form-group">
         <button type="submit" id="submit" class="btn btn-default">Search</button>
       </div>
-    </div>
+    </div> -->
 
     <hr>
     <br>
@@ -165,20 +176,24 @@ unset($result[0]);
           <?php
         
               if (count($result) > 0) {
-                foreach( $result as $job ){
-                  echo '<tr>';
-                  echo '<td><a target="_blank" href="'.$job['17'].'">'.$job['4'].'</td>' ;
-                  echo '<td>'.$job['9'].'</td>';
-                  echo '<td>'.$job['5'].'</td>';
-                  echo '<td>'.$job['8'].'</td>';
-                  echo '<td>'.date('m/d/Y H:i:s', strtotime($job['3'])).'</td>';
-                  echo '</tr>';               
-                }
-              }
-              
-             
-           
-  ?>
+                foreach( $result as $job ){ 
+                  
+                 
+                  if(isset($salary) && !empty($salary)){
+                    $salary = $job['8'];
+                  }else{
+                    $salary = 0;
+                  }
+                  ?>
+                  <tr>
+                  <td><a class="jobBtn" data-title="<?php echo $job['4']; ?>" data-company="<?php echo $job['5']; ?>"  data-salary="<?php echo $salary; ?>" data-posted="<?php echo $job['3']; ?>" target="_blank" href="<?php echo $job['17']; ?>"><?php echo $job['4']; ?></td>
+                 <td><?php echo $job['9']; ?></td>
+                  <td><?php echo $job['5']; ?></td>
+                  <td><?php echo $job['8']; ?></td>
+                  <td><?php echo date('m/d/Y', strtotime($job['3'])); ?></td>
+                 </tr>               
+                <?php }
+              }?>
           </tbody>
         </table>
         <?php
@@ -209,7 +224,24 @@ unset($result[0]);
   </form>
 </div>
 <script type="text/javascript">
+
+
+
+
+
   $(function() {
+
+    $('body').on('click', '.jobBtn', function() {
+  mixpanel.track('Table Job Link Clicked',{
+    'Title':$(this).attr("data-title"),
+    'JobCompany':$(this).attr("data-company"),
+    'Salary':$(this).attr("data-salary"),
+    'Location':$(this).attr("data-location"),
+    'DatePosted':$(this).attr("data-posted"),
+    'JobUrl':$(this).attr('href')
+    });
+  });
+
 
     $('#tabletodownload').DataTable();
   /*  $("#tabletodownload").tableExport({
